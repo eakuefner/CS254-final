@@ -20,7 +20,7 @@
 %-----------------------------------------------------------------------------
 
 
-\documentclass[preprint]{sigplanconf}
+\documentclass[preprint,10pt,nocopyrightspace]{sigplanconf}
 
 % The following \documentclass options may be useful:
 %
@@ -32,22 +32,22 @@
 
 \begin{document}
 
-\conferenceinfo{WXYZ '05}{date, City.} 
-\copyrightyear{2005} 
-\copyrightdata{[to be supplied]} 
+%\conferenceinfo{WXYZ '05}{date, City.} 
+%\copyrightyear{2005} 
+%\copyrightdata{[to be supplied]} 
 
-\titlebanner{banner above paper title}        % These are ignored unless
-\preprintfooter{short description of paper}   % 'preprint' option specified.
+%\titlebanner{banner above paper title}        % These are ignored unless
+%\preprintfooter{short description of paper}   % 'preprint' option specified.
 
-\title{Title Text}
-\subtitle{Subtitle Text, if any}
+\title{Examining the Connection Between Hardware Architecture and Virtual Machine Design}
+%\subtitle{Subtitle Text, if any}
 
-\authorinfo{Name1}
-           {Affiliation1}
-           {Email1}
-\authorinfo{Name2\and Name3}
-           {Affiliation2/3}
-           {Email2/3}
+%\authorinfo{Name1}
+%           {Affiliation1}
+%           {Email1}
+\authorinfo{Ethan A. Kuefner\and Madhukar Kedlaya}
+           {University of California, Santa Barbara}
+           {\{eakuefner,mkedlaya\}@cs.ucsb.edu}
 
 \maketitle
 
@@ -55,26 +55,15 @@
 This is the text of the abstract.
 \end{abstract}
 
-\category{CR-number}{subcategory}{third-level}
+%\category{CR-number}{subcategory}{third-level}
 
-\terms
-term1, term2
+%\terms
+%term1, term2
 
-\keywords
-keyword1, keyword2
+%\keywords
+%keyword1, keyword2
 
-\section{Introduction}
-
-The text of the paper begins here.
-
-\appendix
-\section{Appendix Title}
-
-This is the text of the appendix, if you need one.
-
-\acks
-
-Acknowledgments, if needed.
+\input{intro.tex}
 
 % We recommend abbrvnat bibliography style.
 
