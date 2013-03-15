@@ -3,7 +3,22 @@
 Interpreters have played a central role in the study of programming languages for as long as programming
 languages have been studied. Explicit in McCarthy's definition of LISP \cite{mccarthy60} is the notion of an
 evaluator, a program designed to run (evaluate) other programs. For many years, interpreters have been used
-to study the design and semantics of programming languages, even while programming remained concentrated in
-languages like FORTRAN, COBOL, and later C which were not interpreted directly but rather compiled to machine
-code and executed. As time has passed, however, interpreted languages have become more and more prevalent outside
-of academic circles. At the end of the 1980s, languages like 
+to study the design and semantics of programming languages. Until recently, however, languages like FORTRAN,
+COBOL, and later C remained popular for programming, because of how fast programs compiled to machine code
+from these languages were.
+
+Java, which appeared in 1995, was one of the first interpreted languages to use a so-called 
+\emph{virtual machine}, and has proved popular. 
+Java programs are compiled down to Java bytecode, which is machine code for the Java Virtual Machine.
+Since Java, bytecode interpreters have become commonplace, and indeed, even in the original academic circles where
+interpreters were conceived and made popular, researchers have connected the old notions of
+interpretation as evaluation with the modern idea of interpreter as virtual machine \cite{ager03}. With
+the advent of the virtual machine language runtime has come an opportunity to rectify the main flaw of
+interpretation alluded to above: the speed gap between interpretation of high-level code and execution of
+machine code. One of the major ways that this has been done is through exploitation of properties of the
+underlying hardware architectures on which these interpreters run.
+
+We divide this paper into three main parts. In the first part, we discuss two papers related to improving
+hardware branch prediction accuracy for virtual machines, and in the second part, we discuss three papers
+related to exploiting memory models and caching. Lastly, we conclude by discussing the possibility of turning the
+tables and applying techniques developed in virtual machine design to the design of new hardware architectures.
