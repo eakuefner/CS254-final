@@ -80,8 +80,12 @@ on the Pentium 4 microprocessor when compared to traditional direct-threaded int
 In \cite{casey07} Casey et al. describe two different techniques for improving branch prediction for virtual
 machines at the hardware level. The techniques are instruction replication and superinstructions, and
 both techniques involve restructuring the instruction stream in some way.
-\subsubsecton{Instruction Replication}
+\subsubsection{Instruction Replication}
 We can view a program's VM instruction listing as a multiset, that is, a table of instructions together with the
 number of times each instruction occurs. In the paper, this is referred to as the ``working set'' of the program.
 Casey et al. observe that if an instruction occurs only once in a program's working set, then as expected, there
-is no problem with branch prediction; the instruction to occur following 
+is no problem with branch prediction; the instruction to occur following that instruction will be the same every
+time. However, if an instruction occurs more than once in the working set, then the behavior of the
+interpreter following the handling of this instruction will no longer be deterministic.
+
+The fix proposed for this 
