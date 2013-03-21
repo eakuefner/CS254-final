@@ -86,6 +86,21 @@ number of times each instruction occurs. In the paper, this is referred to as th
 Casey et al. observe that if an instruction occurs only once in a program's working set, then as expected, there
 is no problem with branch prediction; the instruction to occur following that instruction will be the same every
 time. However, if an instruction occurs more than once in the working set, then the behavior of the
-interpreter following the handling of this instruction will no longer be deterministic.
+interpreter following the handling of this instruction will no longer be deterministic\footnote{This assumes the
+use of a branch target buffer, which for the purposes of this paper we view in a simplistic manner.}.
 
-The fix proposed for this 
+The fix proposed for this is a technique called \emph{instruction replication}, which, as the name suggests,
+involves making multiple copies of a given instruction. For an instruction that occurs more than once in the
+working set, we can copy the instruction as many times at it occurs in the working set, and then tag each
+instruction separately. In doing this, each occurrence of the instruction will have a unique entry
+in the BTB, and thus for each occurrence of the instruction, the following instruction can be predicted
+separately, removing the inaccuracy.
+
+\subsubsection{Superinstructions}
+The technique of using \emph{superinstructions}, which are VM instructions that represent a sequence of multiple
+instructions, has been well-known outside of this context, for the purposes of code size and fetch
+overhead reduction. The Casey paper, however, investigates superinstructions in the context of improving branch
+prediction accuracy. The results of their experiments suggest that use of superinstructions actually reduces
+mispredictions more than it reduces fetch/dispatch overhead. They note that the likely reason for this is the
+fact that a superinstruction standardizes a sequence of instructions that will execute deterministically each
+time the superinstruction is called.
