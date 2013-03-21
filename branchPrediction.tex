@@ -67,7 +67,21 @@ branch misprediction and pipeline flushes.
 The solution to this problem is a variation on subroutine threading called \emph{context threading}. 
 In context threading, the bytecode instructions of the program are transformed into an array of function call 
 instructions and the interpreter executes each one of them serially. 
-The control flow instructions in the program are handled the same way as direct threaded code (using indirect calls). The main idea is to provide different contexts for different instructions that are executed so that the branch predictors can make better decisions. Though at first glance executing a series of function calls seem to be slower compared to a series of jumps, the results suggest otherwise. Context threading reduced the mean branch mispredictions by 95% running standard benchmarks for SableVM(Java) and OCaml interpreter on P4 processor when compared to direct-threaded interpreter.
+The control flow instructions in the program are handled the same way as in direct threaded code 
+(using indirect calls), but because we are now using function calls instead of simple jumps, the interpreter
+is able to provide more context for the instructions being executed, so that the branch predictor will be able
+to make better decisions.
+Though intuition might suggest that a series of function calls would execute slower than a series of jumps, 
+results suggest otherwise. The context threading implementation described in the paper reduced the mean branch 
+mispredictions by 95\% for standard benchmarks on the SableVM virtual machine and the Inria OCaml interpreter 
+on the Pentium 4 microprocessor when compared to traditional direct-threaded interpreters.
 
-\subsection{Instruction replication and Superinstructions}
-In \cite{casey07} Casey et al describe various techniques of improving branch prediction. \note{Need to expand this section}
+\subsection{Modifying Instruction Layouts}
+In \cite{casey07} Casey et al. describe two different techniques for improving branch prediction for virtual
+machines at the hardware level. The techniques are instruction replication and superinstructions, and
+both techniques involve restructuring the instruction stream in some way.
+\subsubsecton{Instruction Replication}
+We can view a program's VM instruction listing as a multiset, that is, a table of instructions together with the
+number of times each instruction occurs. In the paper, this is referred to as the ``working set'' of the program.
+Casey et al. observe that if an instruction occurs only once in a program's working set, then as expected, there
+is no problem with branch prediction; the instruction to occur following 
