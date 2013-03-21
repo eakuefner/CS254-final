@@ -12,24 +12,62 @@ This style of interpreter works by performing a compilation of the program AST t
 bytcode language. The bytecodes are then fetched, decoded, and executed in a loop. Classically, this is done
 using a switch statement that will match opcodes to their corresponding handlers.
 Unfortunately, while this allows linearization of control flow, it introduces new overhead due to
-bytecode fetching and branching.
+bytecode fetching and branching at the hardware level (as opposed to branching in the interpreted language).
 
-{\color{red} \textbf{Continuing here.}}\\
-Other alternatives to the switch-case approach like direct threading, indirect threading also suffer from the similar branch mis-prediction overhead. There branches that are taken depend on the flow of execution or the stream of bytecodes of the program being executed. It does not follow any pattern which is very much the foundation of branch prediction strategies implemented in the hardware. It is important to note here that the branches that we are describing are the ones in the interpreter  loop and should not be confused with the branches in the program being interpreted. The problem with branch mis-prediction is even more exagerated in the case of Dynamic Scripting Languages (DSLs) where the opcode handlers for a dynamic instruction have to first determine the types of the opcodes and them perform operations based on the observed types. This is generally implemented using a \emph{if-else} chain or a \emph{switch-case} construct adding to the number of branches mis-predicted during execution.
 \section{Improving Branch Prediction Accuracy}
-The major drawbacks of this approach are the bytecode fetching/dispatch overhead and branch misprediction. It is well documented in previous research\cite{ertl03} that switch based dispatchs are mispredicted 81\% - 98\% of the time.  Other alternatives to the switch-case approach like direct threading, indirect threading also suffer from the similar branch misprediction overhead (57\% - 63\%) \cite{ertl03}. There branches that are taken depend on the flow of execution or the stream of bytecodes of the program being executed. It does not follow any pattern which is very much the foundation of branch prediction strategies implemented in the hardware. It is important to note here that the branches that we are describing are the ones in the interpreter  loop and should not be confused with the branches in the program being interpreted. The problem with branch mis-prediction is even more exagerated in the case of Dynamic Scripting Languages (DSLs) where the opcode handlers for a dynamic instruction have to first determine the types of the opcodes and them perform operations based on the observed types. This is generally implemented using a \emph{if-else} chain or a \emph{switch-case} construct adding to the number of branches mis-predicted during execution.
+Advanced threading techniques such as direct threading and indirect threading, which improve on the bytecode
+interpreter model by executing sequences of precompiled machine code to handle VM opcodes, manage to do away
+with most of the instruction fetch overhead but retain the potential for overhead from branch misprediction.
+This is because indirect branching is extremely frequent in interpreters, and does not follow a pattern which
+can be resolved easily by today's hardware branch predictors. The branching behavior of an interpreter is
+somewhat unique in that it is entirely driven by the execution flow of the program being executed, so it may
+vary arbitrarily. The problem is exacerbated by the frequent tendency of dynamic languages to include features
+like dynamic typing and reflection, which are themselves frequently handled by additional conditionals.
+
+Indeed, previous research~\cite{ertl03} has found that 81\%-98\% of branches in a conventional switch-based 
+bytecode interpreters are mispredicted, and even in more advanced interpreters with threaded code, the overhead
+is still on the order of 57\%-63\%.
+That interpreters undermine branch prediction in this manner is clearly a problem, and we discuss two attempts
+at fixing the problem from researchers.
 
 \subsection{Dynamo and DynamoRIO}
-Dynamo\cite{bala00} is an pseudo interpreter which interprets machine code and specializes the hot traces that are executed at runtime. It follows the same philosophy as a JIT compiler but at a much lower level. 
+Dynamo~\cite{bala00} is a pseudo-interpreter designed to perform hot trace specialization for native code
+by presenting the same interface as the processor for running native code, but transparently performing the
+specialization in software at runtime. This is similar to the JIT compiler model for language VMs, but operates
+at a much lower-level.
 
-In \cite{sullivan03} Sullivan et. al presented DynamoRIO, based on IA-32 version of Dynamo, as a solution to reduce the interpretation overhead. Using Dynamo or DynamoRIO naively as a binary optimizer for any interpreter does not yield any speedup. This is because DynamoRIO relies on its trace collection heuristic to optimize a binary and as mentioned above the trace of execution of any interpreter depends on the program being interpreted which is unpredictable at runtime. To solve this problem DynamioRIO infrastucture provides APIs to language runtime developers to instrument their interpreters with hooks to a special traceing framework. The hooks provide signals to the underlying framework when to start and stop the trace collection. The idea here is to make sure that the trace that is collected matches the program that is being interpreted rather than the interpreter that is interpreting it. This gives lot more information to the tracing infrastructure to work on and optimize. 
+In \cite{sullivan03} Sullivan et al. give an overview of DynamoRIO, a solution for reducing emulation overhead
+present in Dynamo through translation caching, developed jointly by MIT and HP Labs.
+They then observe that for interpreters, DynamoRIO's trace collection heuristics do not function correctly, and
+thus the impressive speedups typical of DynamoRIO are not present in this setting. This is because, as discussed,
+the control flow of an interpreter is unpredictable, due to the runtime dependency on the program being executed.
+Their solution was to extend DynamoRIO with an API to be used by language runtime developers. 
+This API provides provides hooks to a special tracing framework to be inserted in the interpreter, which signal
+the trace collector to start and stop. This means that the interpreter itself can identify basic blocks in the
+interpreted code and correlate them with basic blocks in the underlying machine code that results, so that
+the tracing infrastructure has much more information about the execution than it would without the hints provided
+by these hooks.
 
 \subsection{Context Threading}
-Context threading takes a different approach on solving the problem. In \cite{berndl05} Berndl et al rephrase the above problem as a "Context problem". Their solution improves upon the direct-threaded interpreter architecture by using subroutine threading. 
+In \cite{berndl05} Berndl et al. view the branch prediction accuracy problem as one of ``contexts''--the
+prediction of a branch to be taken by an interpreter depends on the particular context given by the program being
+executed. 
+The solution that results improves specifically upon the direct-threaded interpreter architecture 
+by using subroutine threading. 
 
-In direct-threaded interpreters the bytecodes are transformed into an array of labels called Direct Threaded Table (DTT) indexed by a virtual PC (vPC). A direct threaded instruction is a label to a specific region of the code in the interpreter that performs the opcode handling. After each opcode is executed the next opcode is "\emph{dispatched}" by calling {\tt goto DTT[vPC++];} i.e. indirect branch. In case of a branch instruction the vPC is computed based on the branch taken in the program being interpreted. This negates the switch-case overhead and has good cache behavior but still suffers a lot due to branch misprediction and pipeline flushes.  
+In traditional direct-threaded interpreters the bytecodes are transformed into an array of labels called 
+ a direct threaded table (DTT), which is then indexed by a virtual program counter (vPC).
+A direct threaded instruction is a label to a specific region of the code in the interpreter that performs 
+the opcode handling. After each opcode is executed the next opcode is "\emph{dispatched}" by calling 
+{\tt goto DTT[vPC++];} i.e. an indirect branch instruction. 
+In case of a branch instruction the vPC is computed based on the branch taken in the program being interpreted.
+This negates the switch-case overhead and has good cache behavior but as discussed, will still falter due to 
+branch misprediction and pipeline flushes.  
 
-The solution to this problem is a variation of subroutine threading called \emph{Context Threading}. In Context Threading the bytecode instructions of the program are transformed into an array of function call instructions and the interpreter executes each one of them serially. The control flow instructions in the program are handled the same way as direct threaded code (using indirect calls). The main idea is to provide different contexts for different instructions that are executed so that the branch predictors can make better decisions. Though at first glance executing a series of function calls seem to be slower compared to a series of jumps, the results suggest otherwise. Context threading reduced the mean branch mispredictions by 95% running standard benchmarks for SableVM(Java) and OCaml interpreter on P4 processor when compared to direct-threaded interpreter.
+The solution to this problem is a variation on subroutine threading called \emph{context threading}. 
+In context threading, the bytecode instructions of the program are transformed into an array of function call 
+instructions and the interpreter executes each one of them serially. 
+The control flow instructions in the program are handled the same way as direct threaded code (using indirect calls). The main idea is to provide different contexts for different instructions that are executed so that the branch predictors can make better decisions. Though at first glance executing a series of function calls seem to be slower compared to a series of jumps, the results suggest otherwise. Context threading reduced the mean branch mispredictions by 95% running standard benchmarks for SableVM(Java) and OCaml interpreter on P4 processor when compared to direct-threaded interpreter.
 
 \subsection{Instruction replication and Superinstructions}
 In \cite{casey07} Casey et al describe various techniques of improving branch prediction. \note{Need to expand this section}
