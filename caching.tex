@@ -9,7 +9,7 @@ instruction caching at the hardware level.
 \subsection{Garbage Collection}
 Many programming languages backed by runtimes do not allow users to manage memory manually, as they can in languages like C.
 Rather, memory is managed automatically and the runtime will attempt to reclaim memory that is no longer in use for when it is
-once again in demand. This process of automatic memory management is called garbage collection.
+once again in demand. This process of automatic memory management is called \emph{garbage collection}.
 Garbage collection is an extremely active area of research, and one of the most performant solutions to emerge so far is the
 so-called \emph{compacting collector}. Compaction moves around the live objects in the heap so that the heap is less fragmented
 and it becomes possible to allocate larger chunks of memory. Because of the amount of copying that this technique requires, it is
@@ -41,7 +41,7 @@ prediction, one potential approach to tying the hardware yet more closely to the
 hinting as to the likelihood of taking or not taking a given branch. The Pentium 4 had a feature that allowed this~\cite{intelsys},
 but it was removed from later models, presumably because of the complexity of implementation. As far as we know, this is an open
 opportunity for research. On the locality side, researchers are working on improving locality for nonlinear data structures, as
-many such structures are common in software. Interpreters contain a myriad of data structures would be ripe for this sort of
+many such structures are common in software. Interpreters contain a myriad of data structures that would be ripe for this sort of
 optimization. In a 2012 paper from OOPSLA~\cite{jo12}, Youngjoon Jo and Milind Kulkarni show a scheme for improving locality
 for tree traversals, which they say they plan to generalize.
 

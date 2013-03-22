@@ -60,10 +60,10 @@
 
 \begin{abstract}
 Virtual machines for programming language interpretation have become popular despite the long-standing generality
-that machine code is faster than interpreted code. By viewing interpreters as virtual machines, we can exploit
+that compiled code is faster than interpreted code. By viewing interpreters as virtual machines, we can exploit
 the similarity between virtual machines and the underlying hardware architectures on which they run to take
 advantage of optimizations implicit in hardware and improve the performance of virtual machines. In this paper,
-branch prediction and cache performance are reviewed as two critical optimizations to be exploited by VMs.
+branch prediction and spatial locality are reviewed as two critical optimizations to be exploited by VMs.
 \end{abstract}
 
 %\category{CR-number}{subcategory}{third-level}
@@ -78,7 +78,7 @@ branch prediction and cache performance are reviewed as two critical optimizatio
 \input{branchPrediction.tex}
 \input{caching.tex}
 % We recommend abbrvnat bibliography style.
-
+\pagebreak
 \bibliographystyle{abbrvnat}
 
 % The bibliography should be embedded for final submission.
@@ -91,4 +91,19 @@ branch prediction and cache performance are reviewed as two critical optimizatio
 simple programming language, written in C++. Use this DynamoRIO \href{http://www.dynamorio.org/tutorial.html}{tutorial} to
 instrument the interpreter with hooks for straight-line code as described in this paper, and then compare the performance
 with and without the tracer enabled. What is the speedup that you observe?
+
+\section{More Ideas}
+In this appendix we list a number of additional ideas along these lines that we might be interested in exploring. You know how
+to reach us!
+\begin{itemize}
+\item What does it mean to design instruction caches for functional programs? Are there additional invariants of programs in
+languages like Haskell that we might exploit?
+\item Above we discussed hinting hardware branch predictors---could the same reasoning be applied to caching? In other words,
+would it be possible to design hardware to which a programmer could indicate that they plan on later using a chunk of memory,
+or using a chunk of memory particularly frequently?
+\item Would it be possible to design hardware features that remove some of the complexities that make adaptive/realtime program
+analyses difficult?
+\item Could we design a system for context-sensitive memory access reordering? In other words, could we apply something like in
+\cite{jo12} to hardware memory access reordering?
+\end{itemize}
 \end{document}

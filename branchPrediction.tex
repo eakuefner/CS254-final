@@ -15,9 +15,9 @@ Unfortunately, while this allows linearization of control flow, it introduces ne
 bytecode fetching and branching at the hardware level (as opposed to branching in the interpreted language).
 
 \section{Improving Branch Prediction Accuracy}
-Advanced threading techniques such as direct threading and indirect threading, which improve on the bytecode
-interpreter model by executing sequences of precompiled machine code to handle VM opcodes, manage to do away
-with most of the instruction fetch overhead but retain the potential for overhead from branch misprediction.
+Advanced threading techniques such as direct threading and indirect threading improve on the bytecode
+interpreter model by executing sequences of precompiled machine code to handle VM opcodes. They get 
+rid of most of the instruction fetch overhead but retain the potential for overhead from branch misprediction.
 This is because indirect branching is extremely frequent in interpreters, and does not follow a pattern which
 can be resolved easily by today's hardware branch predictors. The branching behavior of an interpreter is
 somewhat unique in that it is entirely driven by the execution flow of the program being executed, so it may
@@ -36,23 +36,18 @@ by presenting the same interface as the processor for running native code, but t
 specialization in software at runtime. This is similar to the JIT compiler model for language VMs, but operates
 at a much lower-level.
 
-In \cite{sullivan03} Sullivan et al. give an overview of DynamoRIO, a solution for reducing emulation overhead
-present in Dynamo through translation caching, developed jointly by MIT and HP Labs.
-They then observe that for interpreters, DynamoRIO's trace collection heuristics do not function correctly, and
-thus the impressive speedups typical of DynamoRIO are not present in this setting. This is because, as discussed,
+In \cite{sullivan03} Sullivan et al. give an overview of DynamoRIO, a solution for specializing interpreters
+based on the IA-32 build of Dynamo, developed jointly by MIT and HP Labs.
+They then observe that for interpreters, Dynamo's trace collection heuristics do not function correctly, and
+thus the impressive speedups typical of Dynamo are not present in this setting. This is because, as discussed,
 the control flow of an interpreter is unpredictable, due to the runtime dependency on the program being executed.
-Their solution was to extend DynamoRIO with an API to be used by language runtime developers. 
+Their solution was to extend Dynamo with an API to be used by language runtime developers. 
 This API provides provides hooks to a special tracing framework to be inserted in the interpreter, which signal
-the trace collector to start and stop. This means that the interpreter itself can identify basic blocks in the
-interpreted code and correlate them with basic blocks in the underlying machine code that results, so that
-the tracing infrastructure has much more information about the execution than it would without the hints provided
-by these hooks.
+the trace collector to start and stop. This ensures that the information about the traces collected matches the
+executed program flow and not merely the control flow of the interpreter.
 
 \subsection{Context Threading}
-In \cite{berndl05} Berndl et al. view the branch prediction accuracy problem as one of ``contexts''--the
-prediction of a branch to be taken by an interpreter depends on the particular context given by the program being
-executed. 
-The solution that results improves specifically upon the direct-threaded interpreter architecture 
+In \cite{berndl05} Berndl et al. offer a solution for specifically improving the performance of interpreters using threaded code
 by using subroutine threading. 
 
 In traditional direct-threaded interpreters the bytecodes are transformed into an array of labels called 
@@ -73,7 +68,7 @@ is able to provide more context for the instructions being executed, so that the
 to make better decisions.
 Though intuition might suggest that a series of function calls would execute slower than a series of jumps, 
 results suggest otherwise. The context threading implementation described in the paper reduced the mean branch 
-mispredictions by 95\% for standard benchmarks on the SableVM virtual machine and the Inria OCaml interpreter 
+mispredictions by 95\% for standard benchmarks on the SableVM virtual machine for Java and the Inria OCaml interpreter 
 on the Pentium 4 microprocessor when compared to traditional direct-threaded interpreters.
 
 \subsection{Modifying Instruction Layouts}
