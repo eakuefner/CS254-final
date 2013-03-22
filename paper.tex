@@ -20,7 +20,7 @@
 %-----------------------------------------------------------------------------
 
 
-\documentclass[preprint,nocopyrightspace]{sigplanconf}
+\documentclass[preprint,nocopyrightspace,9pt]{sigplanconf}
 
 % The following \documentclass options may be useful:
 %
@@ -56,7 +56,7 @@
 \maketitle
 
 %TODO: Remove papers from this list as they are cited.
-\nocite{lin11,berndl05,bala00,casey07,wegiel08,sullivan03,jo12}
+\nocite{lin11,wegiel08,sullivan03,jo12}
 
 \begin{abstract}
 Virtual machines for programming language interpretation have become popular despite the long-standing generality
@@ -77,7 +77,6 @@ branch prediction and cache performance are reviewed as two critical optimizatio
 \input{intro.tex}
 \input{branchPrediction.tex}
 \input{caching.tex}
-\input{future.tex}
 % We recommend abbrvnat bibliography style.
 
 \bibliographystyle{abbrvnat}
@@ -86,4 +85,10 @@ branch prediction and cache performance are reviewed as two critical optimizatio
 
 \bibliography{paper.bib}
 
+\appendix
+\section{Sample Homework Problem}
+\href{https://bitbucket.org/eakuefner/cs162interpreter}{Here} is a working bytecode compiler and interpreter toolchain for a
+simple programming language, written in C++. Use this DynamoRIO \href{http://www.dynamorio.org/tutorial.html}{tutorial} to
+instrument the interpreter with hooks for straight-line code as described in this paper, and then compare the performance
+with and without the tracer enabled. What is the speedup that you observe?
 \end{document}

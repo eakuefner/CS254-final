@@ -1,7 +1,53 @@
-\section{Memory models and Caching}
-\note{Give a brief introduction describing the problem here. In garbage collection section we deal with the data cache and memory. The section subsection deals with instruction caches.}
+\section{Memory Models and Caching}
+Spatial locality is an important principle when dealing with caches, which have been an important optimization at the hardware
+level. As one might expect, virtual machines have similar memory models to their hardware counterparts, and thus there are a
+number of optimizations which take advtange of the principle of spatial locality, which holds even in the virtual setting.
+While locality applies mainly in the context of cache performance for hardware, and this is mirrored in the virtual machine
+setting, it can also be exploited in an interesting manner for the purposes of improving garbage collection performance. We will
+discuss first the application of locality to garbage collection, and then a technique for arranging VM code to provide performant
+instruction caching at the hardware level.
 \subsection{Garbage Collection}
-Garbage collection involves reclaiming the precious heap space available after an object is no longer needed by a managed runtime system. This has been an active research agrea and most of the effecient implementations involve use technique called compaction. Compaction moves around the live objects in the heap into a compact region so that there is less fragmentation of the heap. This is a costly operation and usually introduces noticable pause times during program execution. In \cite{wegiel08} Wegiel et al describe a way of using virtual memory system to perform this operation with minimum overhead. The main idea here is to exploit the fact that the dead objects often appear in clusters in the heap. Using virtual memory mapping/unmapping API provided by the operating system, the virtual page which in which all the objects are guaranteed to be dead is unmapped from the heap. Though this technique has its limitations since the collection phase doesn't always free all the dead objects, it is shown to be an efficient technique in collecting the objects from tenured region of the heap in a generational garbage collector. \note{Not complete}
+Many programming languages backed by runtimes do not allow users to manage memory manually, as they can in languages like C.
+Rather, memory is managed automatically and the runtime will attempt to reclaim memory that is no longer in use for when it is
+once again in demand. This process of automatic memory management is called garbage collection.
+Garbage collection is an extremely active area of research, and one of the most performant solutions to emerge so far is the
+so-called \emph{compacting collector}. Compaction moves around the live objects in the heap so that the heap is less fragmented
+and it becomes possible to allocate larger chunks of memory. Because of the amount of copying that this technique requires, it is
+often responsible for long \emph{pause times}. Pause times, which are the durations for which the program execution must pause 
+so that the garbage collector may execute, are an important metric in measuring collector performance.
+
+In \cite{wegiel08} Wegiel et al. describe a method of using an operating system's virtual memory subsystem to perform this 
+compaction operation with minimum overhead. An important observation that they exploit is the fact that the dead objects often 
+appear in clusters in the heap. Spatial locality is most frequently associated with liveness, or ``next use'', but here, it plays
+somewhat of a dual role.  Using the  virtual memory mapping/unmapping API provided by the operating system, pages in which all 
+of the objects are guaranteed to be dead is unmapped from the heap. 
+Though this technique has limitations in that it does not always free all the dead objects, it is shown to be an efficient 
+technique in collecting the objects from tenured region of the heap in a generational garbage collector.
 
 \subsection{Instruction caches}
-In \cite{lin11} Lin et al describes a methodology of arrangement of language runtime code in memory to enable greater performance in cache-sensitive architectures. \note{expand this even more}
+In \cite{lin11} Lin et al. describes a methodology for arranging language runtime code in memory to enable greater instruction
+caching performance. In contrast to the previous application of locality, this application holds more in common with traditional
+applications of locality, in that it views locality as a metric for assessing next use of a memory location. Their technique
+relies on a mathematical model that they build to model execution flows of real applications, and exploits this information to
+place correlated instructions near one another, so that an instruction cache will be able to bring pages containing instructions
+frequently used together into memory all at once. Interestingly, they test their technology on NAND flash memory so slow that their
+experiment would not work if their technique were not sufficiently performant, and in so doing, demonstrate that their approach
+is viable.
+
+\section{Future work}
+
+In both the branch prediction and locality exploitation categories, there is interesting future work to be done. As far as branch
+prediction, one potential approach to tying the hardware yet more closely to the virtual machine would be to provide hardware
+hinting as to the likelihood of taking or not taking a given branch. The Pentium 4 had a feature that allowed this~\cite{intelsys},
+but it was removed from later models, presumably because of the complexity of implementation. As far as we know, this is an open
+opportunity for research. On the locality side, researchers are working on improving locality for nonlinear data structures, as
+many such structures are common in software. Interpreters contain a myriad of data structures would be ripe for this sort of
+optimization. In a 2012 paper from OOPSLA~\cite{jo12}, Youngjoon Jo and Milind Kulkarni show a scheme for improving locality
+for tree traversals, which they say they plan to generalize.
+
+\section{Conclusion}
+
+In conclusion, we have shown several examples of how making connections between virtual machine architectures and the architectures
+of the hardware machines they run on can be a valuable technique for improving the performance of language runtimes. In particular,
+tuning interpreters to coexist with hardware branch predictors and exploiting locality are two overarching techniques that have
+been successful in improving runtime performance in concrete settings.
