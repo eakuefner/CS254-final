@@ -43,7 +43,20 @@ but it was removed from later models, presumably because of the complexity of im
 opportunity for research. On the locality side, researchers are working on improving locality for nonlinear data structures, as
 many such structures are common in software. Interpreters contain a myriad of data structures that would be ripe for this sort of
 optimization. In a 2012 paper from OOPSLA~\cite{jo12}, Youngjoon Jo and Milind Kulkarni show a scheme for improving locality
-for tree traversals, which they say they plan to generalize.
+for tree traversals, which they say they plan to generalize. We have several more ``blue-sky''-type ideas that we would like to
+ enumerate, but the feasibility of which we cannot properly access:
+
+\begin{itemize}
+\item What does it mean to design instruction caches for functional programs? Are there additional invariants of programs in
+languages like Haskell that we might exploit?
+\item Above we discussed hinting hardware branch predictors---could the same reasoning be applied to caching? In other words,
+would it be possible to design hardware to which a programmer could indicate that they plan on later using a chunk of memory,
+or using a chunk of memory particularly frequently?
+\item Would it be possible to design hardware features that remove some of the complexities that make adaptive/realtime program
+analyses difficult?
+\item Could we design a system for context-sensitive memory access reordering? In other words, could we apply something like in
+\cite{jo12} to hardware memory access reordering?
+\end{itemize}
 
 \section{Conclusion}
 

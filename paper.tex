@@ -20,7 +20,7 @@
 %-----------------------------------------------------------------------------
 
 
-\documentclass[preprint,nocopyrightspace,10pt]{sigplanconf}
+\documentclass[preprint,nocopyrightspace,9pt]{sigplanconf}
 
 % The following \documentclass options may be useful:
 %
@@ -78,13 +78,12 @@ branch prediction and spatial locality are reviewed as two critical optimization
 \input{branchPrediction.tex}
 \input{caching.tex}
 % We recommend abbrvnat bibliography style.
-\pagebreak
 \bibliographystyle{abbrvnat}
 
 % The bibliography should be embedded for final submission.
 
 \bibliography{paper.bib}
-
+\!
 \appendix
 \section{Sample Homework Problem}
 \href{https://bitbucket.org/eakuefner/cs162interpreter}{Here} is a working bytecode compiler and interpreter toolchain for a
@@ -92,18 +91,5 @@ simple programming language, written in C++. Use this DynamoRIO \href{http://www
 instrument the interpreter with hooks for straight-line code as described in this paper, and then compare the performance
 with and without the tracer enabled. What is the speedup that you observe?
 
-\section{More Ideas}
-In this appendix we list a number of additional ideas along these lines that we might be interested in exploring. You know how
-to reach us!
-\begin{itemize}
-\item What does it mean to design instruction caches for functional programs? Are there additional invariants of programs in
-languages like Haskell that we might exploit?
-\item Above we discussed hinting hardware branch predictors---could the same reasoning be applied to caching? In other words,
-would it be possible to design hardware to which a programmer could indicate that they plan on later using a chunk of memory,
-or using a chunk of memory particularly frequently?
-\item Would it be possible to design hardware features that remove some of the complexities that make adaptive/realtime program
-analyses difficult?
-\item Could we design a system for context-sensitive memory access reordering? In other words, could we apply something like in
-\cite{jo12} to hardware memory access reordering?
-\end{itemize}
+
 \end{document}
